@@ -1,2 +1,7 @@
 
 // your btree implementation goes here
+
+// template<typename T>
+// btree<T>::~btree() {
+// 	delete root_;
+// }
