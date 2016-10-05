@@ -4,76 +4,124 @@
 
 #include "btree.h"
 
-// void foo(const btree<int> &b) {
-//   btree<int>::iterator iter = b.begin();
-//   btree<int>::iterator ends = b.end();
-  // std::cout << *iter << " " << *ends << std::endl;
-  // std::copy(iter, ends, std::ostream_iterator<int>(std::cout, " "));
-//  std::copy(b.begin(), b.end(), std::ostream_iterator<int>(std::cout, " "));
-//   std::cout << std::endl;
-// }
-
-template <typename T> void display(T &c) {
-  std::cout << "Iterating over tree top: ";
-  // typename T::iterator i = c.begin();
-  for (typename T::iterator i = c.begin(); i != c.end(); ++i) 
-  // or for (auto i = c.begin(); i != c.end(); ++i)
-    std::cout << *i << " "; 
+void foo(const btree<int> &b) {
+  std::copy(b.begin(), b.end(), std::ostream_iterator<int>(std::cout, " "));
   std::cout << std::endl;
 }
 
-// template <typename T> void printIterator(T &c) {
-//   std::cout << "element = "<< *c << std::endl;
-// }
+template <typename T> void display(T &c) {
+  std::cout << "Iterating over tree top: ";
+  for (typename T::iterator i = c.begin();i != c.end(); ++i)
+    std::cout << *i << " "; 
+  std::cout << std::endl;
+}
 
 
 int main(int argc, char* argv[]) {
   btree<int> b(3);
 
-  // printf("insert 1\n");
+  printf("insert 1\n");
   b.insert(1);
-  display(b);
+  // display(b);
 
   b.insert(10);
-  display(b);
+  // display(b);
 
-  // printf("insert 8\n");
+  printf("insert 8\n");
   b.insert(8);
-  display(b);
-  
-  // // printf("insert 9\n");
+  // display(b);
+
+  printf("insert 9\n");
   b.insert(9);
-  display(b);
+  // display(b);
 
-  // // printf("insert 4\n");
+  printf("insert 4\n");
   b.insert(4);
-  display(b);
+  // display(b);
 
-  // // printf("insert 5\n");
+  printf("insert 5\n");
   b.insert(5);
-  display(b);
+  // display(b);
 
-  // // printf("insert 14\n");
+  printf("insert 14\n");
   b.insert(14);
+  // display(b);
+
+  printf("insert 0\n");
+  b.insert(0);
+
+  // std::cout << "pointee point to element at index"<< i.getIndex()<< std::endl;
+  // std::cout << "element = "<< *pair.first;
+  // std::cout << ", insert = " << pair.second << '\n';
+
+  std::cout <<"find 10: "<< *b.find(10)<< std::endl;
+
+  printf("copy constructor\n");
+  btree<int> c = b;
+
+  // //  c = b;
+  printf("insert 20\n");
+  b.insert(20);
+  printf("insert 50\n");
+  b.insert(50);
+  printf("insert 22\n");
+  b.insert(22);
+  printf("insert 44\n");
+  b.insert(44);
+  printf("insert 55\n");
+  b.insert(55);
+  printf("insert 55\n");
+  b.insert(55);
+  // display(b);
+
+  printf("insert 77\n");
+  b.insert(77);
+
+  b.insert(18);
+
+  b.insert(52);
+  b.insert(-1);
+  b.insert(56);
+  b.insert(100);
+  c.insert(88);
   display(b);
+  printf("copy assignment\n");
+  btree<int> d;
+  d = b;
 
-  // // printf("insert 0\n");
-  auto pair = b.insert(0);
+  // display(b);
+
+  // display(c);
+
+  // display(d);
+
+  printf("move constructor\n");
+  btree<int> e = std::move(b);
+  // display(b);
+  // display(e);
+
+  printf("move assignment\n");
+  btree<int> f;
+  f = std::move(e);
+
+  std::cout << b << std::endl;
+
+  std::cout << c << std::endl;
+
+  std::cout << d << std::endl;
+
+  std::cout << e << std::endl;
+
+  std::cout << f << std::endl;
+
   display(b);
+  display(c);
+  display(d);
+  display(e);
+  display(f);
 
- // std::cout << "pointee point to element at index"<< i.getIndex()<< std::endl;
-  std::cout << "element = "<< *pair.first;
-  std::cout << ", insert = " << pair.second << '\n';
 
-//  btree<int> c;
-//  c = b;
-
-  // for (btree<int>::iterator iter = b.begin(); iter != b.end(); ++iter)
-  //   std::cout << *iter << std::endl;
-//  cout << std::endl;
-//  for (btree<int>::iterator iter = c.begin(); iter != c.end(); ++iter)
-//    std::cout << *iter << std::endl;
-  // foo(b);
-  //delete [] argv;
+  foo(b);
+  // delete [] argv;
   return 0;
 }
