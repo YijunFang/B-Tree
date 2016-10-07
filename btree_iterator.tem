@@ -3,8 +3,24 @@ btree_iterator<T>::operator*() const {
 	return pointee_->elem_[index_];
 }
 
+//copy assignment
+template<typename T>btree_iterator<T>& 
+btree_iterator<T>::operator =(const btree_iterator& other){
+	pointee_ = other.pointee_;
+	index_ = other.index_;
+	btree_ = other.btree;
+	return *this;
+}
+
 template<typename T> bool
 btree_iterator<T>::operator ==(const btree_iterator<T>& other) const {
+	return (btree_ == other.btree_ 
+		&& pointee_ == other.pointee_ 
+		&& index_ == other.index_);
+}
+
+template<typename T> bool
+btree_iterator<T>::operator ==(const const_btree_iterator<T>& other) const {
 	return (btree_ == other.btree_ 
 		&& pointee_ == other.pointee_ 
 		&& index_ == other.index_);
@@ -15,29 +31,56 @@ btree_iterator<T>::operator ++() {
 	if(pointee_ == nullptr){
 		pointee_ = btree_->_head;
 		index_ = 0;
-	} else if(pointee_->children_[index_+1] != nullptr){
+	} else if(pointee_->children_[index_+1] != nullptr){ //go to children
 		pointee_ = pointee_->children_[index_+1];
-		index_ = 0;
-		moveDown();
-	} else if(index_ < pointee_->usedSpace_-1){
+		moveDown_increament();
+	} else if(index_ < pointee_->usedSpace_-1){//go right
 		index_++;
-	} else
-		moveUp(currElement());
-		
-		return *this;
+	} else{//go up to the one larger than curr
+		moveUp_increament(currElement());
+	}	
+	return *this;
 }
 
 template<typename T> btree_iterator<T>&
 btree_iterator<T>::operator --(){
+	// printf("enter\n");
+	// if(pointee_ ==btree_->_head &&index_ == 0)
+	// 	return *this;
+
 	if(pointee_ == nullptr){
 		pointee_ = btree_->_tail;
 		index_ = pointee_->usedSpace_-1;//the last element
-	}else if (pointee_->children_[index_] != nu)
+	}else if (pointee_->children_[index_] != nullptr){// go down
+		pointee_ = pointee_->children_[index_];
+		moveDown_decreament();
+	}else if (index_>0){//go left
+		--index_;
+	}else{//go up
+		moveUp_decreament(currElement());
+	}	
+	return *this;
 }
 
 
+template<typename T> btree_iterator<T>
+btree_iterator<T>::operator ++(int) {
+	btree_iterator<T> result = *this;
+	++*this;
+	return result;
+}
+
+template<typename T> btree_iterator<T>
+btree_iterator<T>::operator --(int){
+		
+	btree_iterator<T> result = *this;
+	--*this;
+	return result;
+}
+
+//find the element in parent that is greater
 template<typename T> void
-btree_iterator<T>::moveUp(value_type element ){
+btree_iterator<T>::moveUp_increament(value_type element ){
 	if(pointee_->parent_ == nullptr){
 		pointee_ = nullptr;
 		index_ = 0;
@@ -45,22 +88,195 @@ btree_iterator<T>::moveUp(value_type element ){
 	}else{
 		pointee_ = pointee_->parent_;
 		for(index_ = 0; index_ < pointee_->usedSpace_;++index_){
-			if (currElement()> element){
+			if (currElement()> element)
 				return;
-			}
 		}
-		moveUp(element);
+		moveUp_increament(element);
 	}
 }
 
+//find the element in children that is smaller
 template<typename T> void
-btree_iterator<T>::moveDown(){
-	
-	if(pointee_->children_[0] == nullptr) return;
-	pointee_ = pointee_->children_[0];
-	moveDown();
+btree_iterator<T>::moveDown_increament(){
+	index_ = 0;
+	while(pointee_->children_[0] != nullptr) {
+		pointee_ = pointee_->children_[0];	
+	}
 	return;
 }
 
 
+//find the element in parent that is smaller 
+template<typename T>void 
+btree_iterator<T>::moveUp_decreament(value_type element){
+	if(pointee_->parent_ == nullptr){
+		pointee_ = nullptr;
+		index_ = 0;
+		return;
+	}else{
+		pointee_ = pointee_->parent_;
+		for(index_ = pointee_->usedSpace_-1; index_>0; --index_){
+			if(currElement()<element)
+				return;
+		}
+		
+		if(currElement()<element )
+			return;
+		
+		moveUp_decreament(element);
+	}
+}
+
+//find the element in children that is greater
+template<typename T>void 
+btree_iterator<T>::moveDown_decreament(){
+	index_ = pointee_->usedSpace_-1;
+	while(pointee_->children_[pointee_->usedSpace_]!=nullptr){
+		pointee_ = pointee_->children_[pointee_->usedSpace_];
+		index_ = pointee_->usedSpace_-1;
+	}
+	return;
+}
+
+
+// =====================================================================================================
+
+template <typename T> typename const_btree_iterator<T>::reference 
+const_btree_iterator<T>::operator*() const {
+	return pointee_->elem_[index_];
+}
+
+//copy assignment
+template<typename T>const_btree_iterator<T>& 
+const_btree_iterator<T>::operator =(const const_btree_iterator& other){
+	pointee_ = other.pointee_;
+	index_ = other.index_;
+	btree_ = other.btree_;
+	return *this;
+}
+
+template<typename T> bool
+const_btree_iterator<T>::operator ==(const btree_iterator<T>& other) const {
+	return (btree_ == other.btree_ 
+		&& pointee_ == other.pointee_ 
+		&& index_ == other.index_);
+}
+
+template<typename T> bool
+const_btree_iterator<T>::operator ==(const const_btree_iterator<T>& other) const {
+	return (btree_ == other.btree_ 
+		&& pointee_ == other.pointee_ 
+		&& index_ == other.index_);
+}
+
+template<typename T> const_btree_iterator<T>&
+const_btree_iterator<T>::operator ++() {
+	if(pointee_ == nullptr){
+		pointee_ = btree_->_head;
+		index_ = 0;
+	} else if(pointee_->children_[index_+1] != nullptr){ //go to children
+		pointee_ = pointee_->children_[index_+1];
+		moveDown_increament();
+	} else if(index_ < pointee_->usedSpace_-1){//go right
+		index_++;
+	} else{//go up to the one larger than curr
+		moveUp_increament(currElement());
+	}	
+	return *this;
+}
+
+template<typename T> const_btree_iterator<T>&
+const_btree_iterator<T>::operator --(){
+	// printf("enter\n");
+	// if(pointee_ ==btree_->_head &&index_ == 0)
+	// 	return *this;
+
+	if(pointee_ == nullptr){
+		pointee_ = btree_->_tail;
+		index_ = pointee_->usedSpace_-1;//the last element
+	}else if (pointee_->children_[index_] != nullptr){// go down
+		pointee_ = pointee_->children_[index_];
+		moveDown_decreament();
+	}else if (index_>0){//go left
+		--index_;
+	}else{//go up
+		moveUp_decreament(currElement());
+	}	
+	return *this;
+}
+
+template<typename T> const_btree_iterator<T>
+const_btree_iterator<T>::operator ++(int) {
+	const_btree_iterator<T> result = *this;
+	++*this;
+	return result;
+}
+
+template<typename T> const_btree_iterator<T>
+const_btree_iterator<T>::operator --(int){
+		
+	const_btree_iterator<T> result = *this;
+	--*this;
+	return result;
+}
+
+//find the element in parent that is greater
+template<typename T> void
+const_btree_iterator<T>::moveUp_increament(value_type element ){
+	if(pointee_->parent_ == nullptr){
+		pointee_ = nullptr;
+		index_ = 0;
+		return;
+	}else{
+		pointee_ = pointee_->parent_;
+		for(index_ = 0; index_ < pointee_->usedSpace_;++index_){
+			if (currElement()> element)
+				return;
+		}
+		moveUp_increament(element);
+	}
+}
+
+//find the element in children that is smaller
+template<typename T> void
+const_btree_iterator<T>::moveDown_increament(){
+	index_ = 0;
+	while(pointee_->children_[0] != nullptr) {
+		pointee_ = pointee_->children_[0];	
+	}
+	return;
+}
+
+
+//find the element in parent that is smaller 
+template<typename T>void 
+const_btree_iterator<T>::moveUp_decreament(value_type element){
+	if(pointee_->parent_ == nullptr){
+		pointee_ = nullptr;
+		index_ = 0;
+		return;
+	}else{
+		pointee_ = pointee_->parent_;
+		for(index_ = pointee_->usedSpace_-1; index_>0; --index_){
+			if(currElement()<element)
+				return;
+		}
+		
+		if(currElement()<element )
+			return;
+		
+		moveUp_decreament(element);
+	}
+}
+
+//find the element in children that is greater
+template<typename T>void 
+const_btree_iterator<T>::moveDown_decreament(){
+	index_ = pointee_->usedSpace_-1;
+	while(pointee_->children_[pointee_->usedSpace_]!=nullptr){
+		pointee_ = pointee_->children_[pointee_->usedSpace_];
+		index_ = pointee_->usedSpace_-1;
+	}
+	return;
+}
 

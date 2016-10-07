@@ -28,7 +28,12 @@ template<typename T>
 class btree {
 public:
     friend class btree_iterator<T> ;
+    friend class const_btree_iterator<T> ;
+    
     typedef btree_iterator<T> iterator;
+    typedef const_btree_iterator<T> const_iterator; 
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     //constructor
     btree(size_t maxNodeElems = 40);
@@ -47,11 +52,30 @@ public:
 
     friend std::ostream& operator<<<T>(std::ostream& os, const btree<T>& tree);
 
+///
+// typedef reverse_iterator<const_iterator> const_reverse_iterator; 
+// typedef reverse_iterator<iterator> reverse_iterator; 
+
+// reverse_iterator rbegin() { return reverse_iterator(end()); }
+// const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+// reverse_iterator rend() { return reverse_iterator(begin()); }
+// const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
+///
+
     iterator begin() const;
     iterator end() const;
 
+    const_iterator cbegin() const;
+    const_iterator cend() const;
+
+    reverse_iterator rbegin() const;
+    reverse_iterator rend() const;
+
+    const_reverse_iterator  crbegin()   const;
+    const_reverse_iterator  crend()     const;
+
     iterator find(const T& elem);
-    // const_iterator find(const T& elem) const;
+    const_iterator find(const T& elem) const;
 
     std::pair<iterator, bool> insert(const T& elem);
 
@@ -59,10 +83,11 @@ public:
 
     //helper function -update head and tail
     void update_HeadTail();
-    
-    void checkRoot(){
-    //     std::cout << "->usedSpace_ is "<< _root->usedSpace_<< std::endl;
-    //     std::cout << "->treesize is "<< _treeSize<< std::endl;
+    int treeElemNum() const{
+        int i = 0;
+        for (auto iter = begin(); iter!= end(); ++iter)
+            i++;
+        return i;
     }
 
 private:

@@ -2,13 +2,10 @@
 template<typename T>
 btree<T>::btree(size_t maxNodeElems) :
         _root(nullptr), _head(nullptr), _tail(nullptr), _maxElemt(maxNodeElems),
-            _treeSize(0) {printf("btree()\n");}
+            _treeSize(0) {}
 
 template<typename T>
-btree<T>::~btree() {
-    printf("~btree()\n");
-    delete _root;
-}
+btree<T>::~btree() {delete _root; }
 
 //copy constructor
 template<typename T>
@@ -16,7 +13,6 @@ btree<T>::btree(const btree<T>& original) :
         _root(nullptr), _head(nullptr), _tail(nullptr), 
         _maxElemt(original._maxElemt), _treeSize(0) {
 
-    printf("copy constructor is called\n");
     queue<typename btree<T>::Node*> queueNode;
     queueNode.push(original._root);
 
@@ -48,7 +44,6 @@ btree<T>::btree(btree<T> && original) :
 //copy assignment
 template<typename T> btree<T>&
 btree<T>::operator=(const btree<T>& rhs) {
-    printf("copy assignment is called\n");
     if (this != &rhs) {
         delete _root;
         _root = nullptr;
@@ -72,10 +67,7 @@ btree<T>::operator=(const btree<T>& rhs) {
                 }
             }
         }
-    }
-    std::cout <<"====checking _treesize" <<  _treeSize <<"  "<< rhs._treeSize << std::endl;
-    std::cout <<"----checking _maxElemt" <<  _maxElemt <<"  "<< rhs._maxElemt<< std::endl;
-      
+    } 
     return *this;
 }
 
@@ -100,21 +92,72 @@ btree<T>::operator=(btree<T> && rhs) {
 	return *this;
 
 }
-template<typename T> typename btree<T>::iterator
-btree<T>::begin() const {return iterator(_head, 0, this); }
-
-template<typename T> typename btree<T>::iterator
-btree<T>::end() const {return iterator(NULL, 0, this); }
 
 template<typename T> typename btree<T>::iterator
 btree<T>::find(const T& elem){
     if (_root == nullptr) return end();
+    Node *tmp_ = _root;
 
-    for (auto i = begin(); i != end(); ++i) {
-        if( *i == elem){
-            return i;
-        }
-    }
+     while(true) {
+		size_t i;
+		for (i = 0; i < tmp_->usedSpace_; ++i) {
+
+			if (tmp_->elem_[i] == elem) {
+				return iterator(tmp_, i, this);
+
+			} else if (tmp_->elem_[i] > elem) {//check children
+				if (tmp_->children_[i] == nullptr) {
+					return end();
+				} else {
+					tmp_ = tmp_->children_[i];
+					i = 0;
+					break;
+				}
+			}
+		}
+		// go to the last children
+		if (i == tmp_->usedSpace_) {
+			if (tmp_->children_[i] == nullptr) {
+				return end();
+			} else {
+				tmp_ = tmp_->children_[i];
+			}
+		}
+	}
+    return end();
+}
+
+template<typename T> typename btree<T>::const_iterator
+btree<T>::find(const T& elem) const{
+
+    if (_root == nullptr) return end();
+    Node *tmp_ = _root;
+
+    while(true) {
+		size_t i;
+		for (i = 0; i < tmp_->usedSpace_; ++i) {
+			if (tmp_->elem_[i] == elem) {
+				return iterator(tmp_, i, this);
+
+			} else if (tmp_->elem_[i] > elem) {//check children
+				if (tmp_->children_[i] == nullptr) {
+					return end();
+				} else {
+					tmp_ = tmp_->children_[i];
+					i = 0;
+					break;
+				}
+			}
+		}
+		// go to the last children
+		if (i == tmp_->usedSpace_ && tmp_->elem_[i] < elem) {
+			if (tmp_->children_[i] == nullptr) {
+				return end();
+			} else {
+				tmp_ = tmp_->children_[i];
+			}
+		}
+	}
     return end();
 }
 
@@ -138,11 +181,7 @@ void btree<T>::update_HeadTail(){
         }
     }
     _tail = parent;
-    // std::cout << "update_HeadTail(): ";
-    // std::cout <<"head is "<< _head->elem_[0] << "  ||  ";
-    // std::cout <<"tail is "<< _tail->elem_[parent->usedSpace_-1] ;
-    // std::cout <<"  ||  size is "<< _treeSize << std::endl;
-    checkRoot();
+
 }
 
 
@@ -205,7 +244,7 @@ btree<T>::insert(const T& elem) {
 template<typename T> std::ostream&
 operator<<(std::ostream& os, const btree<T>& tree) {
 	if (tree._root == nullptr) return os;
-	
+
     queue<typename btree<T>::Node*> queueNode;
     queueNode.push(tree._root);
 
@@ -224,6 +263,28 @@ operator<<(std::ostream& os, const btree<T>& tree) {
     return os;
 }
 
+template<typename T> typename btree<T>::iterator
+btree<T>::begin() const {return iterator(_head, 0, this); }
+
+template<typename T> typename btree<T>::iterator
+btree<T>::end() const {return iterator(NULL, 0, this); }
 
 
+template<typename T>typename btree<T>::const_iterator
+btree<T>::cend() const {return const_iterator(end()); }
+
+template<typename T>typename btree<T>::const_iterator
+btree<T>::cbegin() const {return const_iterator(begin()); }
+
+template<typename T>typename btree<T>::reverse_iterator
+btree<T>::rend() const {return reverse_iterator(begin()); }
+
+template<typename T>typename btree<T>::reverse_iterator
+btree<T>::rbegin() const {return reverse_iterator(end()); }
+
+template<typename T>typename btree<T>::const_reverse_iterator
+btree<T>::crbegin() const {return const_reverse_iterator(end());}
+
+template<typename T>typename btree<T>::const_reverse_iterator
+btree<T>::crend() const {return const_reverse_iterator(begin());}
 

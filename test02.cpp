@@ -89,16 +89,9 @@ int main(int argc, char* argv[]) {
   btree<int> d;
   d = b;
 
-  // display(b);
-
-  // display(c);
-
-  // display(d);
-
   printf("move constructor\n");
   btree<int> e = std::move(b);
-  // display(b);
-  // display(e);
+
 
   printf("move assignment\n");
   btree<int> f;
